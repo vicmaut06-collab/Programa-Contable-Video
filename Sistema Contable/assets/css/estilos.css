@@ -1,0 +1,505 @@
+:root {
+  --color-deudor: #1d4ed8;
+  --color-acreedor: #b91c1c;
+}
+
+body {
+  background-color: #f4f6f9;
+  font-size: 0.92rem;
+}
+
+.navbar {
+  background: linear-gradient(90deg, #0f2a4a 0%, #14396b 100%);
+}
+
+main {
+  min-height: 70vh;
+}
+
+.card {
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+  border: 1px solid #e5e9f0;
+}
+
+.card-header {
+  background-color: #fff;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e9f0;
+}
+
+.tabla-contables {
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-contables td.num,
+.tabla-contables th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.marca-clase {
+  background-color: #0f2a4a;
+  color: #fff;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.marca-grupo {
+  background-color: #eef2f8;
+  font-weight: 600;
+}
+
+.marca-total {
+  background-color: #dde5f0;
+  font-weight: 700;
+}
+
+.marca-total-final {
+  background-color: #0f2a4a;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sub {
+  display: inline-block;
+  color: #64748b;
+}
+
+.cuenta-ok {
+  color: var(--color-deudor);
+}
+
+.cuenta-error {
+  color: var(--color-acreedor);
+  font-weight: 600;
+}
+
+.cuadra {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.no-cuadra {
+  color: var(--color-acreedor);
+  font-weight: 700;
+}
+
+.linea-partida td {
+  vertical-align: middle;
+}
+
+/* =========================================================
+   Formulario de asientos: partidas como tarjetas
+   ========================================================= */
+
+.paso-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: .45rem;
+  border-radius: 50%;
+  background: #0f2a4a;
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.header-boton {
+  float: right;
+}
+
+.card-body-explica {
+  display: flex;
+  gap: .75rem;
+  background: #f8fafc;
+  border-bottom: 1px dashed #cbd5e1;
+  color: #334155;
+  font-size: .88rem;
+}
+
+.card-body-explica .bi-lightbulb {
+  color: #b45309;
+  font-size: 1.15rem;
+  flex: 0 0 auto;
+}
+
+.partidas-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e9f0;
+}
+
+.filtro-cuentas {
+  max-width: 420px;
+}
+
+.partidas {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  padding: 1rem;
+  background: #f4f6f9;
+}
+
+.partida {
+  background: #fff;
+  border: 1px solid #dbe2ec;
+  border-left: 4px solid #cbd5e1;
+  border-radius: .5rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.partida.con-debe {
+  border-left-color: #1d4ed8;
+}
+
+.partida.con-haber {
+  border-left-color: #b91c1c;
+}
+
+.partida-cabecera {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem .85rem;
+  border-bottom: 1px solid #eef2f7;
+  background: #fbfcfe;
+  border-radius: .45rem .45rem 0 0;
+}
+
+.partida-etiqueta {
+  font-weight: 700;
+  color: #0f2a4a;
+}
+
+.partida-marca {
+  flex: 1 1 auto;
+  font-size: .78rem;
+  font-weight: 600;
+}
+
+.partida.con-debe .partida-marca::after {
+  content: 'Entra a esta cuenta';
+  color: #1d4ed8;
+}
+
+.partida.con-haber .partida-marca::after {
+  content: 'Sale de esta cuenta';
+  color: #b91c1c;
+}
+
+.partida-cuerpo {
+  padding: .85rem;
+}
+
+.partida-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+}
+
+.partida-importes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+  margin-top: .85rem;
+}
+
+.campo-titulo {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  margin-bottom: .3rem;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.campo-paso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: .25rem;
+  background: #0f2a4a;
+  color: #fff;
+  font-size: .7rem;
+}
+
+.campo-ayuda {
+  display: block;
+  margin-top: .25rem;
+  color: #64748b;
+  font-size: .76rem;
+}
+
+.campo-debe .form-control {
+  border-color: #bfdbfe;
+}
+
+.campo-debe .form-control:focus {
+  box-shadow: 0 0 0 .2rem rgba(29, 78, 216, .15);
+}
+
+.campo-haber .form-control {
+  border-color: #fecaca;
+}
+
+.campo-haber .form-control:focus {
+  box-shadow: 0 0 0 .2rem rgba(185, 28, 28, .15);
+}
+
+.campo-debe .debe,
+.campo-haber .haber {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.partida-pista,
+.partida-resumen {
+  margin: .7rem 0 0;
+  font-size: .8rem;
+  color: #64748b;
+}
+
+.partida-pista {
+  margin-top: .85rem;
+  padding-top: .6rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.partida-resumen.texto-ok {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.partidas-agregar {
+  padding: 0 1rem 1rem;
+  background: #f4f6f9;
+}
+
+.resumen-partida {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  background: #fffbeb;
+  border-top: 1px solid #fde68a;
+  border-radius: 0 0 .5rem .5rem;
+}
+
+.resumen-partida.resumen-listo {
+  background: #f0fdf4;
+  border-top-color: #86efac;
+}
+
+.resumen-bloque {
+  display: flex;
+  flex-direction: column;
+}
+
+.resumen-rotulo {
+  font-size: .74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #64748b;
+}
+
+.resumen-valor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.resumen-calculado {
+  padding-left: 1.75rem;
+  border-left: 1px solid #e2e8f0;
+}
+
+.resumen-estado {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  max-width: 340px;
+}
+
+.resumen-mensaje {
+  color: #475569;
+  font-size: .8rem;
+}
+
+.ayuda-reglas details {
+  background: #fff;
+  border: 1px solid #e5e9f0;
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+}
+
+.ayuda-reglas summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f2a4a;
+}
+
+.ayuda-reglas ol {
+  margin: .75rem 0 .5rem;
+  padding-left: 1.25rem;
+  color: #334155;
+  font-size: .88rem;
+}
+
+.ayuda-reglas li {
+  margin-bottom: .3rem;
+}
+
+.acciones-finales {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .partida-columnas,
+  .partida-importes {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-estado {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+/* =========================================================
+   Ayudas de lenguaje en el resto del sistema
+   ========================================================= */
+
+.que-es-esto {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0f2a4a;
+  border-radius: .4rem;
+  padding: .75rem 1rem;
+  color: #334155;
+  font-size: .88rem;
+}
+
+.que-es-esto .bi {
+  color: #0f2a4a;
+  font-size: 1.05rem;
+  flex: 0 0 auto;
+}
+
+.leyenda-columnas {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-size: .8rem;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: .4rem;
+  padding: .6rem .9rem;
+  margin-bottom: 1rem;
+}
+
+.leyenda-columnas b {
+  color: #0f2a4a;
+}
+
+.vacio-amable {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #64748b;
+}
+
+.vacio-amable .bi {
+  font-size: 2.5rem;
+  color: #cbd5e1;
+  display: block;
+  margin-bottom: .5rem;
+}
+
+.vacio-amable h5 {
+  color: #334155;
+}
+
+
+.cuenta-seleccionada {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.reporte {
+  background: #fff;
+  padding: 1.5rem;
+}
+
+.reporte h1 {
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reporte h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid #0f2a4a;
+  padding-bottom: 0.2rem;
+}
+
+.reporte h3 {
+  font-size: 0.9rem;
+}
+
+.encabezado-reporte {
+  border-bottom: 3px double #0f2a4a;
+  padding-bottom: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    font-size: 0.8rem;
+  }
+
+  .reporte {
+    padding: 0;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  @page {
+    size: letter portrait;
+    margin: 1.2cm;
+  }
+}
