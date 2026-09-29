@@ -15,6 +15,7 @@ $cuentasHoja = db()->query(
 )->fetchAll();
 
 $resumen = [];
+$hojasResumen = [];
 $detalle = [];
 $cuentaSel = null;
 
@@ -28,6 +29,31 @@ foreach ($saldos as $s) {
         continue;
     }
     $resumen[] = $s;
+    $hojasResumen[$s['codigo']] = true;
+}
+
+// Igual que en el balance de comprobacion: se inserta la cuenta de mayor y el
+// subrubro encima de sus hojas, con subtotal, para que se lea
+// "EFECTIVO Y EQUIVALENTES DE EFECTIVO > CAJA > CAJA PRINCIPAL".
+$arbolResumen = [];
+foreach ($saldos as $s) {
+    if ((int)$s['es_hoja'] === 1) {
+        if (isset($hojasResumen[$s['codigo']])) {
+            $s['es_fila_grupo'] = 0;
+            $arbolResumen[] = $s;
+        }
+        continue;
+    }
+    if (!in_array((int)$s['nivel'], [4, 6], true)) {
+        continue;
+    }
+    foreach (array_keys($hojasResumen) as $codigoHoja) {
+        if (str_starts_with((string)$codigoHoja, $s['codigo'])) {
+            $s['es_fila_grupo'] = 1;
+            $arbolResumen[] = $s;
+            break;
+        }
+    }
 }
 
 $totalDebeResumen = array_sum(array_map(static fn($s) => (float)$s['debe'], $resumen));
@@ -231,7 +257,7 @@ require __DIR__ . '/../includes/header.php';
                 </tr>
             </thead>
             <tbody>
-            <?php if (!$resumen): ?>
+            <?php if (!$arbolResumen): ?>
                 <tr><td colspan="7">
                     <div class="vacio-amable">
                         <i class="bi bi-journal-plus"></i>
@@ -243,7 +269,7 @@ require __DIR__ . '/../includes/header.php';
             <?php endif; ?>
             <?php
             $tipoActual = '';
-            foreach ($resumen as $s):
+            foreach ($arbolResumen as $s):
                 if ($tipoActual !== $s['tipo']):
                     $tipoActual = $s['tipo'];
             ?>
@@ -251,7 +277,7 @@ require __DIR__ . '/../includes/header.php';
                     <td colspan="7"><?= e($s['codigo']) ?> &middot; <?= e(tipoNombre($s['tipo'])) ?></td>
                 </tr>
             <?php endif; ?>
-                <tr class="<?= $s['nivel'] >= 6 ? '' : 'marca-grupo' ?>">
+                <tr class="<?= $s['es_fila_grupo'] ? 'marca-grupo' : '' ?>">
                     <td class="fw-semibold"><?= e($s['codigo']) ?></td>
                     <td>
                         <?= guiones((int)$s['nivel']) ?><?= e($s['nombre']) ?>

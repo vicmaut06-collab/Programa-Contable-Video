@@ -12,6 +12,7 @@ $mostrarSinMovimiento = param('todos') === '1';
 $saldos = saldosPorCuenta($desde, $hasta, null, 8);
 
 $filas = [];
+$hojasVisibles = [];
 foreach ($saldos as $s) {
     if (!$mostrarSinMovimiento && (float)$s['debe'] == 0.0 && (float)$s['haber'] == 0.0) {
         continue;
@@ -20,6 +21,33 @@ foreach ($saldos as $s) {
         continue;
     }
     $filas[] = $s;
+    $hojasVisibles[$s['codigo']] = true;
+}
+
+// Arma el arbol que se ve en pantalla: cada cuenta de mayor (nivel 4) y cada
+// subrubro (nivel 6) aparece arriba de sus hojas, con su subtotal. Sin esto el
+// reporte saltaba del encabezado "Activo" directo a las hojas y nunca se veia
+// "EFECTIVO Y EQUIVALENTES DE EFECTIVO" ni "CAJA".
+$arbol = [];
+foreach ($saldos as $s) {
+    $esHoja = (int)$s['es_hoja'] === 1;
+    if ($esHoja) {
+        if (isset($hojasVisibles[$s['codigo']])) {
+            $s['es_fila_grupo'] = 0;
+            $arbol[] = $s;
+        }
+        continue;
+    }
+    if (!in_array((int)$s['nivel'], [4, 6], true)) {
+        continue;
+    }
+    foreach (array_keys($hojasVisibles) as $codigoHoja) {
+        if (str_starts_with((string)$codigoHoja, $s['codigo'])) {
+            $s['es_fila_grupo'] = 1;
+            $arbol[] = $s;
+            break;
+        }
+    }
 }
 
 $totalDebe = array_sum(array_map(static fn($s) => (float)$s['debe'], $filas));
@@ -125,7 +153,7 @@ require __DIR__ . '/../includes/header.php';
                 </tr>
             </thead>
             <tbody>
-            <?php if (!$filas): ?>
+            <?php if (!$arbol): ?>
                 <tr><td colspan="6">
                     <div class="vacio-amable">
                         <i class="bi bi-inbox"></i>
@@ -137,7 +165,7 @@ require __DIR__ . '/../includes/header.php';
             <?php endif; ?>
             <?php
             $tipoPrevio = null;
-            foreach ($filas as $s):
+            foreach ($arbol as $s):
                 if ($tipoPrevio !== $s['tipo']):
                     $tipoPrevio = $s['tipo'];
             ?>
@@ -145,7 +173,7 @@ require __DIR__ . '/../includes/header.php';
                     <td colspan="6"><?= e(tipoNombre($s['tipo'])) ?> (codigo <?= e($s['codigo'][0]) ?>)</td>
                 </tr>
             <?php endif; ?>
-                <tr>
+                <tr class="<?= $s['es_fila_grupo'] ? 'marca-grupo' : '' ?>">
                     <td class="fw-semibold"><?= e($s['codigo']) ?></td>
                     <td><?= guiones((int)$s['nivel']) ?><?= e($s['nombre']) ?></td>
                     <td class="num"><?= (float)$s['debe'] > 0 ? money($s['debe']) : '' ?></td>

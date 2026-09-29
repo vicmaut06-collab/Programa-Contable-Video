@@ -21,22 +21,16 @@ if errorlevel 1 (
     echo [1/3] PostgreSQL ya esta corriendo.
 )
 
-REM --- 2. Apache ---
-tasklist /fi "imagename eq httpd.exe" | find "httpd.exe" >nul
-if errorlevel 1 (
-    echo [2/3] Iniciando Apache...
-    start "" wscript.exe //nologo "%RUTA%iniciar_apache.vbs"
-    timeout /t 5 /nobreak >nul
-) else (
-    echo [2/3] Apache ya esta corriendo.
-)
-
-REM --- 3. Comprobacion ---
-timeout /t 2 /nobreak >nul
-curl -s -o nul -w "" "%URL%"
+REM --- 2. Apache con cache limpio ---
+REM Reinicia Apache y fuerza a recargar estilos y scripts, para no quedar
+REM viendo una version vieja guardada en el navegador.
+REM LIMPIAR-CACHE.bat ya comprueba que la pagina responde.
+echo [2/3] Limpiando cache y reiniciando Apache...
+call "%RUTA%LIMPIAR-CACHE.bat" silencioso
 if errorlevel 1 (
     echo.
-    echo [3/3] NO se pudo abrir la pagina. Espera unos segundos e intenta de nuevo.
+    echo No se pudo dejar Apache listo.
+    echo Abre XAMPP y presiona Start en Apache, luego ejecuta INICIAR.bat otra vez.
     echo.
     pause
     exit /b 1
