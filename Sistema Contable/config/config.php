@@ -12,6 +12,7 @@ define('DB_CHARSET', 'utf8');
 define('APP_NAME', 'Sistema Contable');
 define('MONEDA', '$');
 define('MAX_LINEAS', 50);
+define('ASSET_VERSION', '1');
 
 date_default_timezone_set('America/El_Salvador');
 

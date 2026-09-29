@@ -73,6 +73,13 @@ foreach ($cuentasPost as $i => $cuentaId) {
         $errores[] = 'Linea ' . $linea . ': la cuenta ' . $cuenta['codigo'] . ' es un grupo o cuenta de nivel superior. Registre el movimiento en una cuenta de detalle.';
         continue;
     }
+    // El tipo de cuenta se deduce de la propia cuenta: el navegador no decide
+    $grupoReal = substr($cuenta['codigo'], 0, 1);
+    $grupoEnviado = trim((string)($gruposPost[$i] ?? ''));
+    if ($grupoEnviado !== '' && $grupoEnviado !== $grupoReal) {
+        $errores[] = 'Linea ' . $linea . ': el tipo de cuenta no corresponde a la cuenta ' . $cuenta['codigo'] . '. Vuelva a elegir la cuenta.';
+        continue;
+    }
     if ($debe < 0 || $haber < 0) {
         $errores[] = 'Linea ' . $linea . ': los importes no pueden ser negativos.';
         continue;

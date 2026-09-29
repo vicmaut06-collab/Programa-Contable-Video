@@ -201,9 +201,9 @@ main {
 }
 
 .partida-columnas {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .85rem;
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: .85rem;
 }
 
 .partida-importes {
@@ -373,10 +373,24 @@ main {
   flex-wrap: wrap;
 }
 
+@media (max-width: 991px) {
+  .partida-columnas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .partida-columnas .campo:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 767px) {
   .partida-columnas,
   .partida-importes {
     grid-template-columns: 1fr;
+  }
+
+  .partida-columnas .campo:last-child {
+    grid-column: auto;
   }
 
   .resumen-estado {

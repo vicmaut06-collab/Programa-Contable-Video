@@ -13,6 +13,19 @@ function url(string $ruta = ''): string
     return BASE_URL . '/' . ltrim($ruta, '/');
 }
 
+/**
+ * URL de un archivo de estilos o script con una version que cambia sola.
+ * Sin esto el navegador se queda con el archivo viejo guardado en su cache
+ * y la pagina sigue mostrando la version anterior del sistema.
+ */
+function asset(string $ruta): string
+{
+    $base = url($ruta);
+    $archivo = __DIR__ . '/../' . ltrim($ruta, '/');
+    $version = is_file($archivo) ? (string)filemtime($archivo) : (string)ASSET_VERSION;
+    return $base . '?v=' . $version;
+}
+
 function redirect(string $ruta): never
 {
     header('Location: ' . url($ruta));

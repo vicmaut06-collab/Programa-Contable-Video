@@ -25,31 +25,19 @@ if (isset($_GET['id'])) {
 $tituloPagina = $asiento['id'] ? 'Editar Asiento' : 'Registrar Asiento';
 
 $grupos = db()->query(
-    'SELECT codigo, nombre FROM catalogo_cuentas WHERE nivel = 2 AND activo = 1 ORDER BY codigo'
+    'SELECT codigo, nombre FROM catalogo_cuentas WHERE nivel = 1 AND activo = 1 ORDER BY codigo'
 )->fetchAll();
 
 $cuentas = db()->query(
-    'SELECT id, codigo, nombre, nivel, LEFT(codigo, 2) AS grupo
+    'SELECT id, LEFT(codigo, 1) AS grupo
      FROM catalogo_cuentas
-     WHERE es_hoja = 1 AND activo = 1 AND nivel >= 6
+     WHERE es_hoja = 1 AND activo = 1
      ORDER BY codigo'
 )->fetchAll();
 
 $grupoDeCuenta = [];
 foreach ($cuentas as $c) {
     $grupoDeCuenta[(int)$c['id']] = $c['grupo'];
-}
-
-function opcionesCuentasHtml(array $cuentas, string $seleccionada): string
-{
-    $html = '<option value="">Primero elija el tipo de cuenta</option>';
-    foreach ($cuentas as $c) {
-        $sangria = str_repeat('&nbsp;&nbsp;', max(0, ((int)$c['nivel'] - 6) / 2));
-        $html .= '<option value="' . (int)$c['id'] . '" data-grupo="' . e($c['grupo']) . '"'
-            . ((string)$c['id'] === $seleccionada ? ' selected' : '') . '>'
-            . $sangria . e($c['codigo']) . ' &middot; ' . e($c['nombre']) . '</option>';
-    }
-    return $html;
 }
 
 function opcionesGruposHtml(array $grupos, string $seleccionado): string
@@ -63,7 +51,6 @@ function opcionesGruposHtml(array $grupos, string $seleccionado): string
 }
 
 $opcionesGrupos = opcionesGruposHtml($grupos, '');
-$opcionesCuentas = opcionesCuentasHtml($cuentas, '');
 
 $numeroSugerido = $asiento['id']
     ? (int)$asiento['numero']
@@ -77,9 +64,9 @@ if (!$partidas) {
 }
 
 /** Estructura visual de una partida. Se reutiliza para pintar y para la plantilla. */
-function bloquePartida(int $indice, string $gruposHtml, string $cuentasHtml, string $debe, string $haber): string
+function bloquePartida(int $indice, string $gruposHtml, string $debe, string $haber, string $cuentaId = ''): string
 {
-    return '<div class="partida partida-vacia">'
+    return '<div class="partida partida-vacia" data-cuenta="' . e($cuentaId) . '">'
         . '<div class="partida-cabecera">'
         . '<span class="partida-etiqueta num-linea">Partida ' . $indice . '</span>'
         . '<span class="partida-marca"></span>'
@@ -89,12 +76,20 @@ function bloquePartida(int $indice, string $gruposHtml, string $cuentasHtml, str
         . '<div class="partida-cuerpo">'
         . '<div class="partida-columnas">'
         . '<div class="campo">'
-        . '<label class="campo-titulo"><span class="campo-paso">A</span> Tipo de cuenta</label>'
+        . '<label class="campo-titulo"><span class="campo-paso">1</span> Tipo de cuenta</label>'
         . '<select name="grupo[]" class="form-select sel-grupo">' . $gruposHtml . '</select>'
         . '</div>'
         . '<div class="campo">'
-        . '<label class="campo-titulo"><span class="campo-paso">B</span> Cuenta de detalle</label>'
-        . '<select name="cuenta_id[]" class="form-select sel-cuenta">' . $cuentasHtml . '</select>'
+        . '<label class="campo-titulo"><span class="campo-paso">2</span> Cuenta de mayor</label>'
+        . '<select class="form-select sel-mayor" disabled>'
+        . '<option value="">Primero elija el tipo de cuenta</option>'
+        . '</select>'
+        . '</div>'
+        . '<div class="campo">'
+        . '<label class="campo-titulo"><span class="campo-paso">3</span> Sub cuenta</label>'
+        . '<select name="cuenta_id[]" class="form-select sel-cuenta" disabled>'
+        . '<option value="">Primero elija la cuenta de mayor</option>'
+        . '</select>'
         . '</div>'
         . '</div>'
         . '<div class="partida-importes">'
@@ -120,12 +115,14 @@ function bloquePartida(int $indice, string $gruposHtml, string $cuentasHtml, str
 $filasPartida = '';
 foreach ($partidas as $i => $p) {
     $cuentaId = (string)$p['cuenta_id'];
+    $debe = (float)$p['debe'];
+    $haber = (float)$p['haber'];
     $filasPartida .= bloquePartida(
         $i + 1,
         opcionesGruposHtml($grupos, $grupoDeCuenta[$cuentaId] ?? ''),
-        opcionesCuentasHtml($cuentas, $cuentaId),
-        e($p['debe'] === '' || $p['debe'] === null ? '' : num($p['debe'], 2)),
-        e($p['haber'] === '' || $p['haber'] === null ? '' : num($p['haber'], 2))
+        $debe > 0 ? e(num($debe, 2)) : '',
+        $haber > 0 ? e(num($haber, 2)) : '',
+        $cuentaId
     );
 }
 
@@ -262,7 +259,7 @@ require __DIR__ . '/../includes/header.php';
 </form>
 
 <template id="plantilla-partida">
-    <?= bloquePartida(1, $opcionesGrupos, $opcionesCuentas, '', '') ?>
+    <?= bloquePartida(1, $opcionesGrupos, '', '') ?>
 </template>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

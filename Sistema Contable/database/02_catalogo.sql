@@ -425,7 +425,8 @@ SELECT t.codigo,
          ELSE 'ORDEN'
        END AS tipo,
        CASE
-         WHEN CHAR_LENGTH(t.codigo) > 2 THEN LEFT(t.codigo, CHAR_LENGTH(t.codigo) - 2)
+         WHEN CHAR_LENGTH(t.codigo) >= 3 THEN LEFT(t.codigo, CHAR_LENGTH(t.codigo) - 2)
+         WHEN CHAR_LENGTH(t.codigo) = 2  THEN LEFT(t.codigo, 1)
          ELSE NULL
        END AS padre_codigo,
        CASE WHEN (SELECT COUNT(*) FROM cat_tmp_carga h
@@ -443,5 +444,11 @@ UPDATE catalogo_cuentas SET padre_codigo = '4102'  WHERE codigo = '41021';
 UPDATE catalogo_cuentas SET padre_codigo = '41021' WHERE codigo LIKE '410210%';
 UPDATE catalogo_cuentas SET padre_codigo = '4103'  WHERE codigo = '41031';
 UPDATE catalogo_cuentas SET padre_codigo = '41031' WHERE codigo LIKE '410310%';
+
+-- Los rubros de agrupacion (nivel 2) cuelgan del grupo que les corresponde por codigo.
+-- Esta linea tambien repara instalaciones hechas antes de que existiera el enlace.
+UPDATE catalogo_cuentas
+SET padre_codigo = LEFT(codigo, 1)
+WHERE nivel = 2 AND (padre_codigo IS NULL OR padre_codigo = '');
 
 DROP TABLE IF EXISTS cat_tmp_carga;
